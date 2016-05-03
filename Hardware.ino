@@ -1,44 +1,47 @@
 /*  
  *  Sends readings through serial port so it may be added to CSV file  
- *  By Jimmy Andrés Vargas Delgado, April 4th, 2016
+ *  By Jimmy Andrés Vargas Delgado, April 26th, 2016
 */
 //  libraries
-//  pin constants
-const int sensorPin0 = 0;// contact temperature 1
-const int sensorPin1 = 1;// contact temperature 2
-const int sensorPin2 = 2;// illuminance
+#include <Wire.h>
+#include <Adafruit_ADS1015.h>
+
+Adafruit_ADS1115 ads;
+
 //  variables
 int index = 0;
-float sensorValue[3] = {0,0,0};// ct1, ct2, lux
 String dataString = "";
 String serialInput = "";
-//  
+
+
 void setup()
 {
-pinMode(sensorPin0, INPUT);
-pinMode(sensorPin1, INPUT);
-pinMode(sensorPin2, INPUT);
 Serial.begin(9600);
+
+
+//ads.setGain(GAIN_SIXTEEN);    // 16x gain  +/- 0.256V  1 bit = 0.0078125mV
+ads.setGain(GAIN_TWO);        // 2x gain   +/- 2.048V  1 bit = 0.0625mV
+ads.begin();
 }
 //  main loop
 void loop()
 {
+ int16_t adc0, adc1, adc2;
  if (Serial.available()>0)
- { 
+ {
    serialInput=Serial.readStringUntil(';');
    index = serialInput.toInt();
     switch(index) 
     { 
       case 1:// read sensors and send to serial port
       {
-        sensorValue[0] = analogRead(sensorPin0);
-        sensorValue[1] = analogRead(sensorPin1);
-        sensorValue[2] = analogRead(sensorPin2);
-        dataString = String(sensorValue[0]) + ";" + String(sensorValue[1]) + ";" + String(sensorValue[2]);
+        adc0 = ads.readADC_SingleEnded(0);
+        adc1 = ads.readADC_SingleEnded(1);
+        adc2 = ads.readADC_SingleEnded(2);
+        dataString = String(adc1) + ";" + String(adc2) + ";" + String(adc0);
         Serial.println(dataString);
         break;
       }
     }
  }
 }
-//  functions
