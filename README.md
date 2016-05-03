@@ -1,2 +1,2 @@
 # Buttercups
-Sensing of flower illuminance and inner and outer temperature with realtime data analysis.
+Sensing of flower illuminance and inner and outer temperature with realtime data analysis and logging.
